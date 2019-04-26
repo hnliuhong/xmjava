@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!-- mybatis的主配置文件,主要配置连接数据库的相关信息 -->
+<configuration>
+
+	<typeAliases>
+		<typeAlias type="cn.xm.model.Product" alias="product"/>
+	    <!-- 采用的是包扫描机制,默认会把包里面的所有类都注册别名(默认类的简单名称且首字母小写)  
+		    <package name="cn.yd.model" />
+	    -->
+	   
+	</typeAliases>
+	
+	<!-- 添加映射文件 -->
+	<mappers>
+		<mapper resource="cn/xm/dao/ProductDao.xml" />
+		<!-- Dao与Mapper文件必须在相同的包中,而且名称必须相同	
+		<package name="cn.xm.dao" />
+		 -->
+	</mappers>
+</configuration>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd 
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-4.0.xsd 
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-4.0.xsd 
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+	
+	
+	<!-- 1: datasource C3p0  DBCP: 配置连接池   C3p0就是用来取代Connection连接 -->
+	<bean id="dataSouce" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<!-- 必须要有相应的set方法 -->
+		<property name="user" value="root" />
+		<property name="password" value="root" />
+		<property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/demo" />
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+	</bean>
+	
+	<!-- spring整合mybatis的切入点: 此类用来加载mybatis配置文件 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	    <!-- spring来管理实现,则应该采用spring自身dataSouce -->
+		<property name="configLocation" value="classpath:mybatis.cfg.xml" />
+		<property name="dataSource" ref="dataSouce" />
+	</bean>
+	
+	<!-- 根据mapper映射文件,动态生成daoImpl,里面采用的是Proxy动态代理 -->
+	<bean id="productDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="cn.xm.dao.ProductDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="productService" class="cn.xm.service.impl.ProductServiceImpl">
+		<property name="productDao" ref="productDao" />
+	</bean>
+	
+	
+	<!-- 上面方式不够智能,可以采用扫描dao接口来实现,动态生成的daoImpl默认名称就是接口简单名称
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="cn.yd.dao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	-->	
+	
+	<!-- 1: Spring提供了事务管理器: 事务本质是数据库的概念 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSouce" />
+	</bean>
+	
+	<!-- 3: 配置哪些方法需要在运行时候动态切入事务(通知),一般切入Service的方法 -->
+	<tx:advice id="advice" transaction-manager="transactionManager">
+		<tx:attributes>
+		    <!-- REQUIRED : 必须要有事务,如果没有则自动创建一个 -->
+			<tx:method name="save*" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<!-- 配置切面表达式  -->
+		<aop:pointcut expression="execution(* cn.xm.service.impl.*.*(..))" id="pt"/>
+		<aop:advisor advice-ref="advice" pointcut-ref="pt"/>
+	</aop:config>	
+	
+</beans>
