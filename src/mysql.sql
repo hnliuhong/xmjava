@@ -20,3 +20,4 @@ insert into product (name,price,remark) values ('华为手机',3000.00,'这里�
 insert into product (name,price,remark) values ('Iphone8',6000.00,'这里是Iphone8手机简单介绍');
 
 select * from product where name like '%%';
+delete from product;

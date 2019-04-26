@@ -13,7 +13,7 @@ public class NotifyWait {
 				synchronized ("java") {
 					try {
 						System.out.println("thread name:" + Thread.currentThread().getName());
-						"java".wait();
+						"java".wait(); // sleep
 						System.out.println("notify name:" + Thread.currentThread().getName());
 					} catch (Exception e) {
 						throw new RuntimeException(e);

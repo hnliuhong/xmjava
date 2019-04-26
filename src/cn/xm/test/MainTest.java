@@ -18,7 +18,7 @@ public class MainTest {
 		 * 
 		 * 4: 测试Spring面向接口编程
 		 */
-		ApplicationContext context = new ClassPathXmlApplicationContext("spring-bean.xml");
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring-*.xml");
 		ProductService ps = context.getBean("productService", ProductService.class);
 		Product product = new Product("vivo手机2", 2999.00, "这里是vivo手机的详细介绍");
 		ps.save(product);
